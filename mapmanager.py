@@ -6,42 +6,57 @@ class MapManager:
 
         # Збереження посилання на модель та текстурку
         self.model = "assets/models/block"
-        self.texture = "assets/textures/sand1.png"
+        self.texture = "assets/textures/block.png"
 
         self.startNew()
 
-        self.createSome()
 
 
     def startNew(self):
         self.land = self.game.render.attachNewNode("land")
 
-    def addBlock(self, position, color):
+    def addBlock(self, position):
         # Завантаження моделі блока і тектури та накладання на неї текстури
         self.block = self.game.loader.loadModel(self.model)
         self.block_texture = self.game.loader.loadTexture(self.texture)
         self.block.setTexture(self.block_texture)
 
         # Встановлення кольору та позиції
-        #self.block.setColor(color)
+
         self.block.setPos(position)
 
         # Прив'язка до сцени
         self.block.reparentTo(self.land)
 
-    def createSome(self):
-        for j in range(10):
-            for i in range(10):
-                self.addBlock(position=(0+i, 10+j, 0), color=(random(), random(), random(), 1))
+    def clear(self):
+        self.land.removeNode()
+        self.startNew()
+    def loadMap(self, map_file, texture_file):
+        self.clear()
 
-        for i in range(4):
-            self.addBlock(position=(0, 10, 1+i), color=(random(), random(), random(), 1))
+        pos_lines = open(map_file).read().strip().split("\n")
+        texture_lines = open(texture_file).read().strip().split("\n")
 
-        for i in range(4):
-            self.addBlock(position=(9, 10, 1+i), color=(random(), random(), random(), 1))
+        y = 0
+        while y < len(pos_lines):
+            row_line = pos_lines[y].split()
+            texture_line = texture_lines[y].split()
+            x = 0
 
-        for i in range(4):
-            self.addBlock(position=(0, 19, 1+i), color=(random(), random(), random(), 1))
+            while x < len(row_line):
+                height = int(row_line[x])
+                texture_num = texture_line[x]
 
-        for i in range(4):
-            self.addBlock(position=(9, 19, 1+i), color=(random(), random(), random(), 1))
+                if texture_num == "0":
+                    self.texture = "assets/textures/block_wood.png"
+                elif texture_num == "1":
+                    self.texture = "assets/textures/sand1.png"
+                elif texture_num == "2":
+                    self.texture = "assets/textures/wood.png"
+
+                z = 0
+                while z <= height:
+                    self.addBlock((x,y,z))
+                    z+=1
+                x+=1
+            y+=1
